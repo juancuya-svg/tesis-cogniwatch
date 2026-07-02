@@ -1,0 +1,10 @@
+{
+  "cv_auc_mean": 0.9662437524029219,
+  "cv_auc_std": 0.02118747405435761,
+  "cv_acc_mean": 0.8964705882352941,
+  "cv_acc_std": 0.05614149807358106,
+  "holdout_auc": 0.8986928104575163,
+  "holdout_accuracy": 0.8,
+  "n_rows": 174,
+  "n_features": 450
+}
