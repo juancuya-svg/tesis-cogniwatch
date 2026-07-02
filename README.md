@@ -1,44 +1,114 @@
-# CogniWatch - Proyecto de Tesis
+# CogniWatch Thesis Project
 
-Este repositorio contiene el proyecto de tesis CogniWatch, una propuesta basada en ciencia de datos e inteligencia artificial para el análisis, monitoreo y predicción de riesgos mediante el uso de modelos de machine learning.
+CogniWatch is a thesis-ready digital health platform for **functional and cognitive monitoring**. It is not positioned as a diagnostic device. Instead, it combines:
 
-## Objetivo del proyecto
+- **Longitudinal wearable monitoring** from Wear OS + Health Connect.
+- **Caregiver-friendly tracking** of sleep, activity, heart metrics, adherence, check-ins, and alerts.
+- **A cognitive-motor microassessment layer** inspired by the DARWIN handwriting dataset, adapted for smartphone touch interaction.
+- **A monitoring-tier model** trained from NACC clinical data and adapted into non-diagnostic support levels.
+- **A hybrid rules + ML alert engine** that compares patients against their own baseline.
 
-Desarrollar una solución inteligente capaz de analizar datos, identificar patrones relevantes y apoyar la toma de decisiones mediante modelos predictivos y visualización de resultados.
+## Why this architecture
 
-## Tecnologías utilizadas
+The uploaded data led to a better product decision than a “smartwatch-only Alzheimer app”:
 
-- Python
-- Google Colab / Jupyter Notebook
-- Pandas
-- NumPy
-- Matplotlib
-- Scikit-learn
-- Machine Learning
-- Análisis de datos
-- Visualización de resultados
+1. **DARWIN** is not smartwatch telemetry. It is a small, high-dimensional cognitive-motor dataset built from 25 digital handwriting tasks. It is best used as an **initial or follow-up microassessment module** inside the patient app.
+2. **NACC** is large, longitudinal, and much stronger for defining a **baseline monitoring profile** and support-tier engine.
+3. Wearables are strongest for **continuous observation** (sleep, steps, heart rate, inactivity, adherence, longitudinal drift).
 
-## Contenido del repositorio
+The result is a **hybrid platform**:
 
-- `tesis-cogniwatch.pdf`: documento principal del proyecto de tesis.
-- `notebooks/`: notebooks utilizados para el análisis y modelado.
-- `images/`: gráficos, resultados e imágenes del proyecto.
-- `presentacion-cogniwatch.pdf`: presentación del proyecto.
+- **Phone app**: onboarding, consent, caregiver linking, self-reports, optional drawing/tapping microtasks, Health Connect permissioning, summary view.
+- **Wear OS app**: passive data collection and sync cues.
+- **Backend**: JWT auth, role-based access, patient/caregiver relationships, daily summaries, alerts, notes, monitoring scores.
+- **Caregiver web dashboard**: patients, trends, alerts, notes, support tier.
+- **ML layer**:
+  - DARWIN-based cognitive-motor proxy model.
+  - NACC-based monitoring tier model.
+  - Personalized anomaly scoring for daily wearable signals.
 
-## Metodología general
+## Monorepo structure
 
-1. Recolección y revisión de datos.
-2. Limpieza y preparación de datos.
-3. Análisis exploratorio.
-4. Entrenamiento de modelos.
-5. Evaluación de resultados.
-6. Interpretación de métricas.
-7. Propuesta de implementación y viabilidad.
+```text
+/apps
+  /android-patient-app
+  /wearos-module
+  /caregiver-web
+  /admin-console
+/backend
+/ml
+/shared
+/infra
+/data
+```
 
-## Resultados esperados
+## What is production-ready vs. thesis-ready
 
-El proyecto busca demostrar cómo la ciencia de datos puede aplicarse para detectar patrones, generar alertas, apoyar decisiones y mejorar procesos mediante el uso de modelos predictivos.
+This repository is **thesis-ready and development-ready**:
 
-## Conclusión
+- Backend code is executable.
+- Dockerized local stack is included.
+- ML training and inference scripts are included.
+- Web dashboard is source-ready.
+- Android and Wear OS modules are source-ready and organized for Android Studio.
 
-CogniWatch representa una propuesta académica aplicada que integra análisis de datos, machine learning y visualización para resolver una problemática real mediante herramientas tecnológicas.
+Because this environment does not ship Android SDKs, an APK/AAB was not compiled here. Source code and project files are included so you can open them directly in Android Studio.
+
+## Recommended smartwatch
+
+**Primary low-cost reference device**: Samsung Galaxy Watch FE.
+
+Why:
+- Wear OS device available in Peru.
+- Sleep, heart and activity tracking coverage is enough for this thesis.
+- Lower cost than Pixel Watch while still aligning with the requested stack.
+- Good fit for Health Services + phone-side Health Connect strategy.
+
+**Premium reference device**: Pixel Watch 3, if budget allows and you want Google-first testing.
+
+## Quick start
+
+### 1) Run backend + database + caregiver web
+
+```bash
+docker compose up --build
+```
+
+Services:
+- API: http://localhost:8000
+- API docs: http://localhost:8000/docs
+- Caregiver web: http://localhost:3000
+- PostgreSQL: localhost:5432
+
+### 2) Seed demo data
+
+```bash
+docker compose exec backend python -m app.db.seed
+```
+
+### 3) Train / refresh ML artifacts
+
+```bash
+python ml/src/models/train_darwin.py
+python ml/src/models/train_nacc_monitor.py
+```
+
+### 4) Open mobile apps
+
+- Open `apps/android-patient-app` in Android Studio.
+- Open `apps/wearos-module` in Android Studio.
+
+## Demo credentials
+
+After seeding:
+- Caregiver: `caregiver@cogniwatch.local` / `ChangeMe123!`
+- Patient: `patient@cogniwatch.local` / `ChangeMe123!`
+- Admin: `admin@cogniwatch.local` / `ChangeMe123!`
+
+## Key thesis message
+
+This project should be presented as:
+
+> A configurable digital monitoring platform for functional and cognitive change detection using wearable signals, caregiver observation, self-report, and optional cognitive-motor microassessments.
+
+It should **not** be presented as medical diagnosis software.
